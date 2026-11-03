@@ -1,24 +1,12 @@
-# HKMU Same-City Courier System
+# Same-City Courier System
 
-A browser-based coursework prototype for HKMU COMP 3500SEF / 8500SEF. It models a Hong Kong same-city parcel journey from order creation and simulated payment to dispatch, pickup, delivery to a storage point, and limited recipient tracking.
+This is our group project for **HKMU COMP 3500SEF**. We built a small web app for sending parcels within Hong Kong. A sender creates and pays for an order, a dispatcher assigns a rider, and the rider takes the parcel to a storage point. The recipient can then check its status with the tracking number and the last four digits of their phone number.
 
-This is a **local demonstration application**, not a live courier or payment service. `DELIVERED` means the Rider handed the parcel to an active storage point; it does not mean the Recipient collected it.
+The payment is simulated. In this project, `DELIVERED` means the parcel has reached a storage point, not that the recipient has collected it.
 
-## What you can demonstrate
+## Run the project
 
-| Role | Available actions |
-| --- | --- |
-| Sender | Register, create an order, view orders, simulate payment, and track a parcel. |
-| Dispatcher | Assign paid orders to Riders, reassign before pickup, and resolve delivery failures. |
-| Rider | Start pickup, confirm pickup, deliver to an active storage point with evidence, or report failure. |
-| Recipient | Track limited status information from the home page using a tracking number and the last four digits of the recipient phone number. No account is required. |
-| Administrator | Create staff accounts, grant Rider or Dispatcher access to an existing account, activate/deactivate staff accounts, and manage storage points. |
-
-One registered account can hold Sender, Rider, and Dispatcher roles together. Only an Administrator can grant staff roles. The interface is in English and works on desktop and mobile screens.
-
-## Run locally
-
-Requirements: **Node.js 22 or newer** and npm. The application uses SQLite, so no separate database server is needed.
+You need Node.js 22 or newer and npm.
 
 ```bash
 git clone https://github.com/yuguangze1717-arch/hkmu-same-city-courier.git
@@ -26,17 +14,16 @@ cd hkmu-same-city-courier
 npm ci
 cp .env.example .env
 npm run db:seed
-npm test
 npm start
 ```
 
-On Windows, copy `.env.example` to `.env` using File Explorer or `copy .env.example .env` in Command Prompt. Before starting, replace `SESSION_SECRET` and `PAYMENT_SECRET` in `.env` with different long random values. Open **http://localhost:3100**. Stop the server with `Ctrl+C`.
+Change `SESSION_SECRET` and `PAYMENT_SECRET` in `.env` to two different long random strings before starting the app. On Windows, you can copy `.env.example` to `.env` in File Explorer instead of using `cp`.
 
-The database is created automatically at `data/courier.sqlite` unless `DB_PATH` is changed. `npm run db:seed` can be run more than once without duplicating the sample accounts or storage points. Local `.env`, database files, and installed dependencies are excluded from Git.
+Open **http://localhost:3100** in your browser. The SQLite database is created at `data/courier.sqlite`. You do not need to install a separate database server. Run `npm test` to run the tests.
 
-## Sample accounts
+## Demo accounts
 
-These accounts are for **local demonstration only**. Each initially uses `Demo1234!` as its password.
+Run `npm run db:seed` first. All four accounts start with the password `Demo1234!`.
 
 | Role | Email |
 | --- | --- |
@@ -45,33 +32,25 @@ These accounts are for **local demonstration only**. Each initially uses `Demo12
 | Rider | `rider@example.com` |
 | Administrator | `admin@example.com` |
 
-To demonstrate the full journey:
+These accounts are only for trying the app locally. Please do not use them for a public deployment.
 
-1. Sign in as **Sender**. Create an order with pickup and destination districts, address details, parcel category, short description, estimated weight, and recipient details. For example, use `98765432` as the recipient phone number. Record the tracking number and select **Simulate payment**.
-2. Sign out and sign in as **Dispatcher**. Assign the now `PAID` order to an active Rider.
-3. Sign out and sign in as **Rider**. Start pickup, confirm pickup, then choose an active storage point and enter delivery evidence.
-4. Sign out. On the home page, enter the tracking number and phone suffix `5432` to view the limited tracking timeline.
-5. Sign in as **Administrator** to manage storage points or choose **Grant role to an existing account**. Enter a registered Sender email and select Rider or Dispatcher; the existing email, password, and Sender access stay in place.
+## Try one delivery
 
-## Technology and project structure
+1. Log in as **Sender** and create an order. Fill in the Hong Kong districts, addresses, parcel details, estimated weight, and recipient details. You can use `98765432` as the recipient phone number. Save the tracking number, then click **Simulate payment**.
+2. Log in as **Dispatcher** and assign the paid order to a rider.
+3. Log in as **Rider**. Start pickup, confirm pickup, and deliver the parcel to an active storage point. Enter a short delivery note as evidence.
+4. Log out. On the home page, enter the tracking number and `5432` to check the parcel as a recipient.
 
-- Node.js, Express 5, EJS templates, Bootstrap 5, custom CSS, and browser JavaScript
-- SQLite through `better-sqlite3`; `express-session` for local sessions; `dotenv` for configuration
-- Node's built-in `node:test` runner (`npm test`)
-- Server-side layers: `src/routes` → `src/services` → `src/domain` → `src/repositories`; schema and sample data are in `src/db`
-- A mock `PaymentGateway`; **no real payment is made**
+The **Administrator** can add staff and storage points. They can also give an existing Sender account Rider or Dispatcher access without changing that account's email or password. The user can then open each role page from the top navigation.
 
-## Business rules and assumptions
+## How we built it
 
-- Normal order flow: `CREATED → PAID → ASSIGNED → PICKING_UP → PICKED_UP → DELIVERED`. `PICKED_UP → FAILED → DELIVERED/CANCELLED` is a simplified failure-resolution path awaiting group confirmation. `DELIVERED` is delivery to a storage point.
-- A `CREATED` quote lasts 15 minutes. Expiry is checked when the order is accessed or payment is attempted; there is no background expiry job.
-- Sender enters an estimated actual weight from 0.01 to 20 kg. This **project tariff** is HK$35 up to 1 kg, plus HK$7 for each additional 0.5 kg through 5 kg, then HK$12 for each additional 1 kg. Weight rounds up to the next billing step. The rounding approach is informed by [SF Express Hong Kong's domestic rate sheet](https://htm.sf-express.com/hk/tc/download/HK-Express-Service-Rate-sender-paid_20260130.pdf); **the amounts are our own coursework assumptions, not SF Express prices**. The server recalculates the amount when an order is created.
-- A paid order can have one current Rider. Reassignment is allowed before pickup and requires a reason. Rider delivery requires an active storage point and text evidence.
-- Recipient tracking returns status, timestamps, and the storage point only. It does not reveal names, phone numbers, addresses, or internal notes.
-- Deactivating a staff account currently disables all its roles, including Sender. This is a simplified account-management rule.
+We used Node.js, Express 5, EJS, Bootstrap 5, SQLite (`better-sqlite3`), and `express-session`. Pages are rendered on the server, with a little browser JavaScript for form checks and the price preview. The code is split into `routes`, `services`, `domain`, and `repositories`. Tests use Node's built-in test runner.
 
-## Current limits
+The main order path is `CREATED → PAID → ASSIGNED → PICKING_UP → PICKED_UP → DELIVERED`. A rider can report a failed delivery, which the dispatcher must resolve. Orders in `CREATED` have a 15-minute payment window.
 
-There is no real payment or refund, notification service, map routing, recipient collection confirmation, automated expiry worker, or dispute workflow. The app does not yet calculate volumetric weight, regional surcharges, or price adjustments after weighing the parcel. Staff and storage-point workflows are intentionally compact for demonstration.
+We chose a simple weight-based price for this version: HK$35 up to 1 kg, then HK$7 for each extra 0.5 kg up to 5 kg, and HK$12 for each extra 1 kg above 5 kg. Weight is rounded up to the next step. These are **our project prices**, not a courier company's official rates. The server calculates the price again when the order is created.
 
-**Do not deploy this version to the public internet as-is.** The seeded accounts have known passwords, `express-session` uses its in-memory store, and public tracking needs rate limiting and stronger verification. A hosted copy would also need persistent database storage and production secrets; a plain `localhost` link is only reachable from the computer running the app.
+## What is not finished
+
+There is no real payment, refund, map, notification, dispute process, or recipient pickup confirmation yet. We also have not added volumetric-weight pricing or a background job for expired orders. Sessions are stored in memory, and the current SQLite setup is intended for local use. Before putting the app online, we would need persistent storage, stronger protection for public tracking, and new passwords for the demo accounts.
