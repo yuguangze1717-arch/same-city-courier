@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS payments (
  id INTEGER PRIMARY KEY, order_id INTEGER NOT NULL UNIQUE REFERENCES orders(id),
  status TEXT NOT NULL CHECK(status IN ('pending','succeeded','refund_pending','refunded')),
- amount_cents INTEGER NOT NULL, provider_ref TEXT UNIQUE, paid_at TEXT
+ amount_cents INTEGER NOT NULL, provider_ref TEXT UNIQUE, paid_at TEXT,
+ refund_ref TEXT, refunded_at TEXT
 );
 CREATE TABLE IF NOT EXISTS assignments (
  id INTEGER PRIMARY KEY, order_id INTEGER NOT NULL REFERENCES orders(id), rider_id INTEGER NOT NULL REFERENCES users(id),

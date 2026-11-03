@@ -104,3 +104,42 @@ test('weight tiers round up and server controls order and payment price',()=>{
   assert.equal(x.store.order(order.id).status,'PAID');
   dbClose(x);
 });
+test('sender cancels before payment without a refund',()=>{
+  const x=setup();
+  assert.throws(()=>x.courier.cancel(x.dispatcher,x.order.id),/permission/);
+  x.courier.cancel(x.sender,x.order.id);
+  assert.equal(x.store.order(x.order.id).status,'CANCELLED');
+  assert.equal(x.store.one('SELECT status,refund_ref FROM payments WHERE order_id=?',x.order.id).status,'pending');
+  assert.throws(()=>x.courier.mockPay(x.sender,x.order.id),/CANCELLED/);
+  dbClose(x);
+});
+test('sender cancellation after assignment gives a mock refund and removes the rider task',()=>{
+  const x=setup();
+  x.courier.mockPay(x.sender,x.order.id);
+  x.courier.assign(x.dispatcher,x.order.id,x.rider.id);
+  x.courier.riderAction(x.rider,x.order.id,'depart');
+  x.courier.cancel(x.sender,x.order.id);
+  const order=x.store.order(x.order.id);
+  const payment=x.store.one('SELECT * FROM payments WHERE order_id=?',order.id);
+  assert.equal(order.status,'CANCELLED');
+  assert.equal(order.current_rider_id,null);
+  assert.equal(payment.status,'refunded');
+  assert.match(payment.refund_ref,/^mock-refund-/);
+  assert.ok(payment.refunded_at);
+  assert.equal(x.store.all('SELECT * FROM assignments WHERE order_id=? AND ended_at IS NULL',order.id).length,0);
+  assert.throws(()=>x.courier.riderAction(x.rider,order.id,'pickup'),/not assigned/);
+  assert.throws(()=>x.courier.cancel(x.sender,order.id),/CANCELLED/);
+  dbClose(x);
+});
+test('cancellation is rejected after pickup and for another sender',()=>{
+  const x=setup();
+  x.store.run('INSERT INTO users(name,email,phone,password_hash,role) VALUES (?,?,?,?,?)','Other Sender','other@test.com','91234567','unused','Sender');
+  assert.throws(()=>x.courier.cancel(x.store.user(5),x.order.id),/permission/);
+  x.courier.mockPay(x.sender,x.order.id);
+  x.courier.assign(x.dispatcher,x.order.id,x.rider.id);
+  x.courier.riderAction(x.rider,x.order.id,'depart');
+  x.courier.riderAction(x.rider,x.order.id,'pickup');
+  assert.throws(()=>x.courier.cancel(x.sender,x.order.id),/PICKED_UP/);
+  assert.equal(x.store.one('SELECT status FROM payments WHERE order_id=?',x.order.id).status,'succeeded');
+  dbClose(x);
+});

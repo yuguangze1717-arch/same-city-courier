@@ -43,11 +43,13 @@ These accounts are only for trying the app locally. Please do not use them for a
 
 The **Administrator** can add staff and storage points. They can also give an existing Sender account Rider or Dispatcher access without changing that account's email or password. The user can then open each role page from the top navigation.
 
+In **My orders**, the sender can filter orders by payment, delivery, issue, delivered, and cancelled status. The sender can cancel an order until pickup is confirmed. If it was already paid, the app records a **mock refund** and removes any active Rider assignment. No real money moves.
+
 ## How we built it
 
 We used Node.js, Express 5, EJS, Bootstrap 5, SQLite (`better-sqlite3`), and `express-session`. Pages are rendered on the server, with a little browser JavaScript for form checks and the price preview. The code is split into `routes`, `services`, `domain`, and `repositories`. Tests use Node's built-in test runner.
 
-The main order path is `CREATED → PAID → ASSIGNED → PICKING_UP → PICKED_UP → DELIVERED`. A rider can report a failed delivery, which the dispatcher must resolve. Orders in `CREATED` have a 15-minute payment window.
+The main order path is `CREATED → PAID → ASSIGNED → PICKING_UP → PICKED_UP → DELIVERED`. A rider can report a failed delivery, which the dispatcher must resolve. Orders in `CREATED` have a 15-minute payment window. The Rider task page shows pickup and destination addresses plus sender and recipient contact details.
 
 We chose a simple weight-based price for this version: HK$35 up to 1 kg, then HK$7 for each extra 0.5 kg up to 5 kg, and HK$12 for each extra 1 kg above 5 kg. Weight is rounded up to the next step. These are **our project prices**, not a courier company's official rates. The server calculates the price again when the order is created.
 

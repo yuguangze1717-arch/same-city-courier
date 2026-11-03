@@ -46,6 +46,28 @@ export function createCourier(store, gateway, now = () => new Date()) {
       const order=actorOrder(actor,id);
       return this.confirmPayment(gateway.pay(order.id,order.amount_cents));
     },
+    cancel(actor,id) {
+      requireRole(actor,'Sender');
+      expire(actorOrder(actor,id));
+      return store.transaction(() => {
+        const order=actorOrder(actor,id);
+        requireStatus(order,'CREATED','PAID','ASSIGNED','PICKING_UP');
+        const payment=store.one('SELECT * FROM payments WHERE order_id=?',order.id);
+        if (order.status==='CREATED') {
+          if (payment.status!=='pending') fail('Payment state does not allow cancellation');
+        } else {
+          if (payment.status!=='succeeded') fail('Payment state does not allow a refund');
+          const refund=gateway.refund(order.id,order.amount_cents);
+          store.run("UPDATE payments SET status='refunded',refund_ref=?,refunded_at=? WHERE order_id=?",refund.ref,stamp(),order.id);
+        }
+        if (order.current_rider_id) {
+          store.run('UPDATE assignments SET ended_at=? WHERE order_id=? AND ended_at IS NULL',stamp(),order.id);
+          store.run('UPDATE orders SET current_rider_id=NULL WHERE id=?',order.id);
+        }
+        change(order,'CANCELLED','order.cancel',actor,payment.status==='pending'?'Cancelled before payment':'Mock refund completed');
+        return store.order(order.id);
+      });
+    },
     confirmPayment(payload) {
       gateway.verify(payload);
       // Persist expiry independently: a rejected late payment must not roll back cancellation.

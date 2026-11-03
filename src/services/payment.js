@@ -5,6 +5,7 @@ export function createMockGateway(secret) {
   const sign = (orderId, amount, ref) => createHmac('sha256', secret).update(`${orderId}:${amount}:${ref}`).digest('hex');
   return {
     pay(orderId, amount) { const ref = randomUUID(); return { orderId, amount, ref, signature: sign(orderId,amount,ref) }; },
+    refund(orderId, amount) { return { orderId, amount, ref: `mock-refund-${randomUUID()}` }; },
     verify(payload) {
       const expected = Buffer.from(sign(payload.orderId,payload.amount,payload.ref), 'hex');
       const received = Buffer.from(String(payload.signature || ''), 'hex');

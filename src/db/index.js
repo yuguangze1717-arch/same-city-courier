@@ -17,5 +17,8 @@ export function openDatabase(path = process.env.DB_PATH || './data/courier.sqlit
   if (!columns.has('item_description')) db.exec("ALTER TABLE orders ADD COLUMN item_description TEXT NOT NULL DEFAULT ''");
   if (!columns.has('weight_grams')) db.exec('ALTER TABLE orders ADD COLUMN weight_grams INTEGER NOT NULL DEFAULT 0');
   if (!columns.has('chargeable_grams')) db.exec('ALTER TABLE orders ADD COLUMN chargeable_grams INTEGER NOT NULL DEFAULT 0');
+  const paymentColumns = new Set(db.prepare('PRAGMA table_info(payments)').all().map(row => row.name));
+  if (!paymentColumns.has('refund_ref')) db.exec('ALTER TABLE payments ADD COLUMN refund_ref TEXT');
+  if (!paymentColumns.has('refunded_at')) db.exec('ALTER TABLE payments ADD COLUMN refunded_at TEXT');
   return db;
 }
