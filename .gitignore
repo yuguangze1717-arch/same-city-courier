@@ -1,0 +1,9 @@
+node_modules/
+.env
+data/
+outputs/
+work/
+AGENTS.md
+PROJECT_CONTEXT.md
+.DS_Store
+coverage/

@@ -1,0 +1,39 @@
+<%- include('partials/head') %>
+<div class="page-actions"><a href="/sender">← Back to hub</a><a href="/sender/orders">My orders</a></div>
+<form method="post" action="/sender/orders" class="card card-body order-form" id="create-order-form" novalidate>
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <div id="order-validation-summary" class="validation-summary" role="alert" <%= Object.keys(formErrors).length ? '' : 'hidden' %>>
+    <strong>Please complete or correct:</strong>
+    <ul><% Object.keys(formErrors).forEach(key=>{ %><li><%= fieldLabels[key] %></li><% }) %></ul>
+  </div>
+  <div class="form-section"><h2 class="h5">Pickup</h2><p class="small text-muted">Select a Hong Kong district and enter the street, building and unit details.</p>
+    <div class="form-grid">
+      <div class="field-group"><label for="pickup_district">Pickup district</label><select class="form-select<%= formErrors.pickup_district?' is-invalid':'' %>" id="pickup_district" name="pickup_district" data-label="Pickup district" aria-describedby="pickup_district-error" aria-invalid="<%= !!formErrors.pickup_district %>" required><option value="">Select district</option><% Object.entries(districtGroups).forEach(([area,names])=>{ %><optgroup label="<%= area %>"><% names.forEach(name=>{ %><option value="<%= name %>" <%= formValues.pickup_district===name?'selected':'' %>><%= name %></option><% }) %></optgroup><% }) %></select><div class="field-error" id="pickup_district-error"><%= formErrors.pickup_district || '' %></div></div>
+      <div class="field-group"><label for="pickup_address">Pickup address details</label><input class="form-control<%= formErrors.pickup_address?' is-invalid':'' %>" id="pickup_address" name="pickup_address" data-label="Pickup address details" aria-describedby="pickup_address-error" aria-invalid="<%= !!formErrors.pickup_address %>" value="<%= formValues.pickup_address || '' %>" placeholder="Street, building, floor and unit" required><div class="field-error" id="pickup_address-error"><%= formErrors.pickup_address || '' %></div></div>
+    </div>
+  </div>
+  <div class="form-section"><h2 class="h5">Destination</h2><p class="small text-muted">The parcel will be handed to a storage point. These details help route it.</p>
+    <div class="form-grid">
+      <div class="field-group"><label for="dropoff_district">Destination district</label><select class="form-select<%= formErrors.dropoff_district?' is-invalid':'' %>" id="dropoff_district" name="dropoff_district" data-label="Destination district" aria-describedby="dropoff_district-error" aria-invalid="<%= !!formErrors.dropoff_district %>" required><option value="">Select district</option><% Object.entries(districtGroups).forEach(([area,names])=>{ %><optgroup label="<%= area %>"><% names.forEach(name=>{ %><option value="<%= name %>" <%= formValues.dropoff_district===name?'selected':'' %>><%= name %></option><% }) %></optgroup><% }) %></select><div class="field-error" id="dropoff_district-error"><%= formErrors.dropoff_district || '' %></div></div>
+      <div class="field-group"><label for="dropoff_address">Destination address details</label><input class="form-control<%= formErrors.dropoff_address?' is-invalid':'' %>" id="dropoff_address" name="dropoff_address" data-label="Destination address details" aria-describedby="dropoff_address-error" aria-invalid="<%= !!formErrors.dropoff_address %>" value="<%= formValues.dropoff_address || '' %>" placeholder="Street, building or nearby landmark" required><div class="field-error" id="dropoff_address-error"><%= formErrors.dropoff_address || '' %></div></div>
+    </div>
+  </div>
+  <div class="form-section"><h2 class="h5">Parcel details</h2><p class="small text-muted">Describe what you are sending and estimate its total weight.</p>
+    <div class="form-grid">
+      <div class="field-group"><label for="item_category">Item category</label><select class="form-select<%= formErrors.item_category?' is-invalid':'' %>" id="item_category" name="item_category" data-label="Item category" aria-describedby="item_category-error" aria-invalid="<%= !!formErrors.item_category %>" required><option value="">Select category</option><% itemCategories.forEach(category=>{ %><option value="<%= category %>" <%= formValues.item_category===category?'selected':'' %>><%= category %></option><% }) %></select><div class="field-error" id="item_category-error"><%= formErrors.item_category || '' %></div></div>
+      <div class="field-group"><label for="weight_kg">Estimated weight (kg)</label><input class="form-control<%= formErrors.weight_kg?' is-invalid':'' %>" id="weight_kg" name="weight_kg" data-label="Estimated weight" aria-describedby="weight_kg-error" aria-invalid="<%= !!formErrors.weight_kg %>" value="<%= formValues.weight_kg || '' %>" inputmode="decimal" placeholder="e.g. 1.25" required><div class="field-error" id="weight_kg-error"><%= formErrors.weight_kg || '' %></div></div>
+      <div class="field-group field-span"><label for="item_description">Item description</label><input class="form-control<%= formErrors.item_description?' is-invalid':'' %>" id="item_description" name="item_description" data-label="Item description" aria-describedby="item_description-error" aria-invalid="<%= !!formErrors.item_description %>" value="<%= formValues.item_description || '' %>" maxlength="120" placeholder="e.g. Two shirts in a small box" required><div class="field-error" id="item_description-error"><%= formErrors.item_description || '' %></div></div>
+    </div>
+    <p class="small text-muted mb-0 mt-2">Please do not send prohibited or dangerous goods.</p>
+  </div>
+  <div class="form-section"><h2 class="h5">Recipient</h2>
+    <div class="form-grid">
+      <div class="field-group"><label for="recipient_name">Recipient name</label><input class="form-control<%= formErrors.recipient_name?' is-invalid':'' %>" id="recipient_name" name="recipient_name" data-label="Recipient name" aria-describedby="recipient_name-error" aria-invalid="<%= !!formErrors.recipient_name %>" value="<%= formValues.recipient_name || '' %>" required><div class="field-error" id="recipient_name-error"><%= formErrors.recipient_name || '' %></div></div>
+      <div class="field-group"><label for="recipient_phone">Recipient phone</label><input class="form-control<%= formErrors.recipient_phone?' is-invalid':'' %>" id="recipient_phone" name="recipient_phone" data-label="Recipient phone" aria-describedby="recipient_phone-error" aria-invalid="<%= !!formErrors.recipient_phone %>" value="<%= formValues.recipient_phone || '' %>" inputmode="tel" required><div class="field-error" id="recipient_phone-error"><%= formErrors.recipient_phone || '' %></div></div>
+    </div>
+  </div>
+  <div class="price-preview" aria-live="polite"><div><span class="small text-muted">Estimated delivery fee</span><strong id="quote-price">Enter weight to see price</strong><small id="quote-weight">Based on estimated actual weight</small></div><p>HK$35 up to 1 kg · +HK$7 per 0.5 kg through 5 kg · +HK$12 per kg above 5 kg. Weight is rounded up to the next billing step.</p></div>
+  <div class="order-form-footer"><span>Quote valid for 15 minutes after creation.</span><button class="btn btn-primary">Create order</button></div>
+</form>
+<script src="/order-form.js" defer></script>
+<%- include('partials/foot') %>

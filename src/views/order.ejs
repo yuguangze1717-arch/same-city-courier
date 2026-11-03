@@ -1,0 +1,16 @@
+<%- include('partials/head') %>
+<div class="page-actions"><a href="/sender/orders">← My orders</a><a href="/sender/orders/new">Create another order</a></div>
+<section class="card card-body">
+  <h2 class="h5"><%= order.tracking_no %></h2>
+  <p>Status: <strong><%= order.status %></strong> · Quote: HK$<%= (order.amount_cents/100).toFixed(2) %></p>
+  <p>Quote valid until: <%= order.expires_at %></p>
+  <p>Payment status: <%= payment.status %></p>
+  <div class="order-addresses">
+    <div><strong>Pickup</strong><span><%= order.pickup_district ? order.pickup_district + ' · ' : '' %><%= order.pickup_address %></span></div>
+    <div><strong>Destination area</strong><span><%= order.dropoff_district %><%= order.dropoff_address ? ' · ' + order.dropoff_address : '' %></span></div>
+  </div>
+  <% if(order.weight_grams){ %><div class="order-addresses"><div><strong>Parcel</strong><span><%= order.item_category %> · <%= order.item_description %></span></div><div><strong>Weight</strong><span>Estimated: <%= (order.weight_grams/1000).toFixed(2) %> kg · Billable: <%= (order.chargeable_grams/1000).toFixed(2) %> kg</span></div></div><% } %>
+  <% if(order.status==='CREATED'){ %><form method="post" action="/sender/orders/<%= order.id %>/pay"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn btn-primary">Simulate payment</button></form><p class="small text-muted mt-2 mb-0">Payment simulation only. No money will be charged.</p><% } %>
+  <h3 class="h6 mt-4">Status history</h3><ol><% events.forEach(e=>{ %><li><%= e.status %> · <%= e.created_at %></li><% }) %></ol>
+</section>
+<%- include('partials/foot') %>

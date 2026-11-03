@@ -1,0 +1,66 @@
+<%- include('partials/head') %>
+<% if(granted){ %><div class="alert alert-success" role="status">Role granted. The account keeps its existing email, password and other roles.</div><% } %>
+<div class="row g-4 admin-grid">
+  <section class="col-lg-6">
+    <div class="card card-body admin-panel">
+      <div class="admin-panel-head">
+        <div><h2 class="h5 mb-1">Staff</h2><p class="text-muted small mb-1"><%= staff.length %> Dispatcher and Rider accounts</p><a class="small fw-bold" href="/admin/staff">Grant role to an existing account →</a></div>
+        <details class="admin-add">
+          <summary class="btn btn-primary">New staff account</summary>
+          <form method="post" action="/admin/staff" class="admin-form">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <p class="small text-muted mb-0">For someone who does not have an account yet.</p>
+            <label>Full name<input class="form-control" name="name" required></label>
+            <label>Email<input class="form-control" name="email" type="email" required></label>
+            <label>Phone<input class="form-control" name="phone" required></label>
+            <label>Initial password<input class="form-control" name="password" type="password" minlength="8" required></label>
+            <label>Role<select class="form-select" name="role"><option>Dispatcher</option><option>Rider</option></select></label>
+            <button class="btn btn-primary">Create account</button>
+          </form>
+        </details>
+      </div>
+      <div class="admin-list">
+        <% staff.forEach(s=>{ %>
+          <details class="point-row staff-row">
+            <summary><span class="admin-row-main"><strong><%= s.name %></strong><span class="admin-meta"><%= s.is_sender?'Sender, ':'' %><%= s.staff_roles %></span></span><span class="point-row-end"><span class="status-pill <%= s.active?'is-active':'is-inactive' %>"><%= s.active?'Active':'Inactive' %></span><span class="edit-hint">Manage</span></span></summary>
+            <div class="staff-actions"><span class="admin-meta"><%= s.email %></span><form method="post" action="/admin/staff/<%= s.id %>/toggle"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn btn-sm btn-outline-secondary"><%= s.active?'Deactivate account':'Activate account' %></button></form></div>
+          </details>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+  <section class="col-lg-6">
+    <div class="card card-body admin-panel">
+      <div class="admin-panel-head">
+        <div><h2 class="h5 mb-1">Storage points</h2><p class="text-muted small mb-0"><%= points.length %> locations</p></div>
+        <details class="admin-add">
+          <summary class="btn btn-primary">Add point</summary>
+          <form method="post" action="/admin/points" class="admin-form">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <label>Point name<input class="form-control" name="name" required></label>
+            <label>Address<input class="form-control" name="address" required></label>
+            <button class="btn btn-primary">Create point</button>
+          </form>
+        </details>
+      </div>
+      <div class="admin-list">
+        <% points.forEach(p=>{ %>
+          <details class="point-row">
+            <summary>
+              <span class="admin-row-main"><strong><%= p.name %></strong><span class="admin-meta"><%= p.address %></span></span>
+              <span class="point-row-end"><span class="status-pill <%= p.active?'is-active':'is-inactive' %>"><%= p.active?'Active':'Inactive' %></span><span class="edit-hint">Edit</span></span>
+            </summary>
+            <form method="post" action="/admin/points/<%= p.id %>" class="admin-form point-edit">
+              <input type="hidden" name="_csrf" value="<%= csrf %>">
+              <label>Point name<input class="form-control" name="name" value="<%= p.name %>" required></label>
+              <label>Address<input class="form-control" name="address" value="<%= p.address %>" required></label>
+              <label>Status<select class="form-select" name="active"><option value="1" <%= p.active?'selected':'' %>>Active</option><option value="0" <%= !p.active?'selected':'' %>>Inactive</option></select></label>
+              <button class="btn btn-primary">Save changes</button>
+            </form>
+          </details>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+</div>
+<%- include('partials/foot') %>

@@ -1,0 +1,13 @@
+<%- include('partials/head') %>
+<div class="page-actions"><a href="/admin">← Back to administration</a></div>
+<section class="card card-body form-narrow">
+  <h2 class="h5">Grant staff access</h2>
+  <p class="text-muted small">Use the email of a registered account. Its password and any existing roles will stay the same.</p>
+  <form method="post" action="/admin/staff/grant" class="d-grid gap-3">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <label>Email<input class="form-control mt-1" name="email" type="email" autocomplete="off" required></label>
+    <label>Staff role<select class="form-select mt-1" name="role"><option value="Rider">Rider</option><option value="Dispatcher">Dispatcher</option></select></label>
+    <button class="btn btn-primary">Grant role</button>
+  </form>
+</section>
+<%- include('partials/foot') %>
