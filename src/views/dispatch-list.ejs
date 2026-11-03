@@ -1,0 +1,7 @@
+<%- include('partials/head') %>
+<div class="page-actions"><a href="/dispatcher">← Dispatch home</a></div>
+<p class="page-intro"><%= description %></p>
+<section class="card card-body dispatch-list-card">
+  <% if(!orders.length){ %><p class="text-muted mb-0">No orders here right now.</p><% } else { %><div class="list-group list-group-flush"><% orders.forEach(o=>{ %><a class="list-group-item list-group-item-action dispatch-list-row" href="/dispatcher/orders/<%= o.id %>/manage"><span><strong><%= o.tracking_no %></strong><small><%= view==='assign'?(o.pickup_district+' → '+o.dropoff_district):view==='reassign'?('Current Rider: '+(o.rider_name||'Unknown')+' · '+o.status):('Rider: '+(o.rider_name||'Unknown')) %></small></span><span class="dispatch-row-action"><%= view==='assign'?'Assign':view==='reassign'?'Change Rider':'Review' %> →</span></a><% }) %></div><% } %>
+</section>
+<%- include('partials/foot') %>

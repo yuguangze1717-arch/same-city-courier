@@ -1,0 +1,18 @@
+<%- include('partials/head') %>
+<div class="page-actions"><a href="/dispatcher/<%= mode %>">← Back to <%= mode==='assign'?'Assign orders':mode==='reassign'?'Change rider':'Delivery issues' %></a></div>
+<section class="card card-body dispatch-manage">
+  <p class="small text-muted mb-1">Order <%= order.tracking_no %> · <%= order.status %></p>
+  <p class="mb-3"><%= order.pickup_district || 'Pickup area not recorded' %> → <%= order.dropoff_district %></p>
+  <% if(mode==='assign'){ %>
+    <h2 class="h5">Choose a Rider</h2>
+    <% if(!riders.length){ %><p>No active Riders are available. Ask an Administrator to add one.</p><% } else { %><form method="post" action="/dispatcher/orders/<%= order.id %>/assign" class="dispatch-simple-form"><input type="hidden" name="_csrf" value="<%= csrf %>"><label for="rider_id">Rider</label><select class="form-select" id="rider_id" name="rider_id" required><option value="">Select Rider</option><% riders.forEach(r=>{ %><option value="<%= r.id %>"><%= r.name %></option><% }) %></select><button class="btn btn-primary">Assign Rider</button></form><% } %>
+  <% } else if(mode==='reassign'){ %>
+    <p class="dispatch-current">Current Rider: <strong><%= order.rider_name || 'Unknown' %></strong></p>
+    <% if(!riders.length){ %><p>No other active Rider is available. Ask an Administrator to add or activate one.</p><% } else { %><form method="post" action="/dispatcher/orders/<%= order.id %>/assign" class="dispatch-simple-form"><input type="hidden" name="_csrf" value="<%= csrf %>"><label for="rider_id">New Rider</label><select class="form-select" id="rider_id" name="rider_id" required><option value="">Select a different Rider</option><% riders.forEach(r=>{ %><option value="<%= r.id %>"><%= r.name %></option><% }) %></select><label for="reason">Reason for change</label><input class="form-control" id="reason" name="reason" placeholder="e.g. Rider unavailable" required><button class="btn btn-primary">Confirm Rider change</button></form><% } %>
+  <% } else { %>
+    <p class="dispatch-current">Rider: <strong><%= order.rider_name || 'Unknown' %></strong></p>
+    <details class="dispatch-choice"><summary>Confirm delivery</summary><form method="post" action="/dispatcher/orders/<%= order.id %>/resolve" class="dispatch-simple-form"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="resolution" value="DELIVERED"><label for="storage_point_id">Storage point</label><select class="form-select" id="storage_point_id" name="storage_point_id" required><option value="">Select storage point</option><% points.forEach(p=>{ %><option value="<%= p.id %>"><%= p.name %></option><% }) %></select><label for="evidence">Delivery evidence</label><input class="form-control" id="evidence" name="evidence" required><button class="btn btn-primary">Confirm delivery</button></form></details>
+    <details class="dispatch-choice"><summary>Cancel order</summary><form method="post" action="/dispatcher/orders/<%= order.id %>/resolve" class="dispatch-simple-form"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="resolution" value="CANCELLED"><p class="small text-muted mb-0">The payment will be marked for a refund review.</p><label for="cancel_reason">Reason for cancellation</label><input class="form-control" id="cancel_reason" name="reason" required><button class="btn btn-outline-danger">Cancel order</button></form></details>
+  <% } %>
+</section>
+<%- include('partials/foot') %>

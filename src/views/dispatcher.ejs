@@ -1,24 +1,8 @@
 <%- include('partials/head') %>
-<div class="dispatch-board">
-  <section class="card card-body dispatch-section">
-    <header class="dispatch-section-head"><div><p class="page-kicker mb-1">FIRST ASSIGNMENT</p><h2 class="h5 mb-1">Assign new orders <span class="dispatch-count"><%= newOrders.length %></span></h2><p class="small text-muted mb-0">Paid orders that do not have a Rider yet.</p></div></header>
-    <% if(!newOrders.length){ %><p class="text-muted small mb-0">No paid orders waiting for assignment.</p><% } %>
-    <% newOrders.forEach(o=>{ %><details class="dispatch-item"><summary><span><strong><%= o.tracking_no %></strong><small><%= o.pickup_district || 'Pickup area not recorded' %> → <%= o.dropoff_district %></small></span><span class="dispatch-action-label">Assign Rider</span></summary>
-      <form method="post" action="/dispatcher/orders/<%= o.id %>/assign" class="dispatch-form"><input type="hidden" name="_csrf" value="<%= csrf %>"><label for="assign-rider-<%= o.id %>">Choose Rider</label><select class="form-select" id="assign-rider-<%= o.id %>" name="rider_id" required><option value="">Select Rider</option><% riders.forEach(r=>{ %><option value="<%= r.id %>"><%= r.name %></option><% }) %></select><% if(!riders.length){ %><p class="small text-muted mb-0">No active Riders are available. Ask an Administrator to add one.</p><% } %><button class="btn btn-primary" <%= riders.length?'':'disabled' %>>Assign Rider</button></form>
-    </details><% }) %>
-  </section>
-
-  <section class="card card-body dispatch-section">
-    <header class="dispatch-section-head"><div><p class="page-kicker mb-1">CHANGE ASSIGNMENT</p><h2 class="h5 mb-1">Reassign active orders <span class="dispatch-count"><%= activeOrders.length %></span></h2><p class="small text-muted mb-0">Available before the Rider confirms pickup. A reason is required.</p></div></header>
-    <% if(!activeOrders.length){ %><p class="text-muted small mb-0">No orders available for reassignment.</p><% } %>
-    <% activeOrders.forEach(o=>{ const otherRiders=riders.filter(r=>r.id!==o.current_rider_id); %><details class="dispatch-item"><summary><span><strong><%= o.tracking_no %></strong><small>Current Rider: <%= o.rider_name || 'Unknown' %> · <%= o.status %></small></span><span class="dispatch-action-label">Change Rider</span></summary>
-      <% if(otherRiders.length){ %><form method="post" action="/dispatcher/orders/<%= o.id %>/assign" class="dispatch-form"><input type="hidden" name="_csrf" value="<%= csrf %>"><label for="reassign-rider-<%= o.id %>">New Rider</label><select class="form-select" id="reassign-rider-<%= o.id %>" name="rider_id" required><option value="">Select a different Rider</option><% otherRiders.forEach(r=>{ %><option value="<%= r.id %>"><%= r.name %></option><% }) %></select><label for="reassign-reason-<%= o.id %>">Reason for reassignment</label><input class="form-control" id="reassign-reason-<%= o.id %>" name="reason" placeholder="e.g. Rider unavailable" required><button class="btn btn-primary">Reassign Rider</button></form><% } else { %><p class="small text-muted mb-0 dispatch-item-note">No other active Rider is available. Ask an Administrator to add or activate one.</p><% } %>
-    </details><% }) %>
-  </section>
+<p class="page-intro">Choose what you need to do with an order.</p>
+<div class="dispatch-hub">
+  <a class="card dispatch-hub-card" href="/dispatcher/assign"><span class="dispatch-hub-count"><%= counts.assign %></span><h2>Assign orders</h2><p>Give a paid order its first Rider.</p><span class="dispatch-hub-link">View orders →</span></a>
+  <a class="card dispatch-hub-card" href="/dispatcher/reassign"><span class="dispatch-hub-count"><%= counts.reassign %></span><h2>Change rider</h2><p>Move an active order to another Rider before pickup.</p><span class="dispatch-hub-link">View orders →</span></a>
+  <a class="card dispatch-hub-card" href="/dispatcher/issues"><span class="dispatch-hub-count"><%= counts.issues %></span><h2>Delivery issues</h2><p>Decide what to do after a failed delivery.</p><span class="dispatch-hub-link">View orders →</span></a>
 </div>
-
-<section class="card card-body dispatch-section mt-4"><header class="dispatch-section-head"><div><p class="page-kicker mb-1">EXCEPTIONS</p><h2 class="h5 mb-1">Delivery issues <span class="dispatch-count"><%= failedOrders.length %></span></h2><p class="small text-muted mb-0">Review failed deliveries separately from Rider assignments.</p></div></header>
-  <% if(!failedOrders.length){ %><p class="text-muted small mb-0">No failed deliveries to review.</p><% } %>
-  <% failedOrders.forEach(o=>{ %><details class="dispatch-item"><summary><span><strong><%= o.tracking_no %></strong><small>Failed delivery · Rider: <%= o.rider_name || 'Unknown' %></small></span><span class="dispatch-action-label">Review issue</span></summary><form method="post" action="/dispatcher/orders/<%= o.id %>/resolve" class="dispatch-form"><input type="hidden" name="_csrf" value="<%= csrf %>"><label for="resolution-<%= o.id %>">Resolution</label><select class="form-select" id="resolution-<%= o.id %>" name="resolution"><option value="DELIVERED">Confirm delivery</option><option value="CANCELLED">Cancel (refund pending)</option></select><label for="point-<%= o.id %>">Storage point (for delivery)</label><select class="form-select" id="point-<%= o.id %>" name="storage_point_id"><option value="">Select storage point</option><% points.forEach(p=>{ %><option value="<%= p.id %>"><%= p.name %></option><% }) %></select><label for="evidence-<%= o.id %>">Delivery evidence (for delivery)</label><input class="form-control" id="evidence-<%= o.id %>" name="evidence"><label for="reason-<%= o.id %>">Cancellation reason (for cancellation)</label><input class="form-control" id="reason-<%= o.id %>" name="reason"><button class="btn btn-primary">Save resolution</button></form></details><% }) %>
-</section>
 <%- include('partials/foot') %>
