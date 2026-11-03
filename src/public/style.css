@@ -40,6 +40,30 @@ table{background:#fff;border-color:var(--line)!important}
 .card form.d-flex.justify-content-between span{min-width:0;overflow-wrap:anywhere}
 .card form.d-flex.justify-content-between button{flex:none;white-space:nowrap}
 
+/* Dispatcher assignment board */
+.dispatch-board{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem}
+.dispatch-section{align-self:start}
+.dispatch-section-head{border-bottom:1px solid var(--line);padding-bottom:1rem;margin-bottom:.4rem}
+.dispatch-section-head .page-kicker{font-size:.7rem}
+.dispatch-count{display:inline-block;vertical-align:middle;margin-left:.3rem;padding:.1rem .5rem;border-radius:2rem;background:var(--blue-100);color:var(--blue-800);font-size:.78rem;letter-spacing:0}
+.dispatch-item{border-bottom:1px solid #e0ecf6}
+.dispatch-item:last-child{border-bottom:0}
+.dispatch-item>summary{display:flex;justify-content:space-between;align-items:center;gap:.75rem;list-style:none;cursor:pointer;padding:1rem .1rem}
+.dispatch-item>summary::-webkit-details-marker{display:none}
+.dispatch-item>summary span:first-child{min-width:0;overflow-wrap:anywhere}
+.dispatch-item strong,.dispatch-item small{display:block}
+.dispatch-item strong{color:var(--blue-950)}
+.dispatch-item small{color:#607a93;font-size:.82rem;margin-top:.15rem}
+.dispatch-action-label{flex:none;color:var(--blue-800);font-size:.82rem;font-weight:750}
+.dispatch-action-label::after{content:' ▾'}
+.dispatch-item[open] .dispatch-action-label::after{content:' ▴'}
+.dispatch-form{display:grid;gap:.5rem;padding:0 .1rem 1rem}
+.dispatch-form label{font-size:.87rem}
+.dispatch-form .btn{justify-self:start;margin-top:.35rem}
+.dispatch-item-note{padding:0 .1rem 1rem}
+@media(max-width:800px){.dispatch-board{grid-template-columns:1fr}}
+@media(max-width:600px){.dispatch-item>summary{align-items:flex-start;flex-direction:column;gap:.3rem}}
+
 /* Compact administration page */
 .admin-panel{height:100%}
 .admin-panel-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:.8rem 1rem;padding-bottom:1rem;border-bottom:1px solid var(--line)}

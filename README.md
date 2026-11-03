@@ -37,7 +37,7 @@ These accounts are only for trying the app locally. Please do not use them for a
 ## Try one delivery
 
 1. Log in as **Sender** and create an order. Fill in the Hong Kong districts, addresses, parcel details, estimated weight, and recipient details. You can use `98765432` as the recipient phone number. Save the tracking number, then click **Simulate payment**.
-2. Log in as **Dispatcher** and assign the paid order to a rider.
+2. Log in as **Dispatcher**. Find the paid order under **Assign new orders** and assign a Rider. Orders that already have a Rider appear separately under **Reassign active orders**, where changing Riders requires a reason.
 3. Log in as **Rider**. Start pickup, confirm pickup, and deliver the parcel to an active storage point. Enter a short delivery note as evidence.
 4. Log out. On the home page, enter the tracking number and `5432` to check the parcel as a recipient.
 
