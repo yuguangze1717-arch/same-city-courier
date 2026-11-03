@@ -9,6 +9,9 @@ body{min-height:100vh;background:linear-gradient(160deg,#e5f3ff 0%,#f2f9ff 55%,#
 .nav-links{display:flex;align-items:center;justify-content:flex-end;gap:.65rem 1.25rem;flex-wrap:wrap}
 .nav-links a{color:var(--blue-950);font-weight:600;text-decoration:none;overflow-wrap:anywhere}
 .nav-links a:hover,.nav-links a:focus-visible{color:var(--blue-700);text-decoration:underline}
+.nav-links .nav-auth{margin-left:auto;flex:none}
+.nav-links a.nav-auth{color:var(--blue-800);border:1px solid var(--blue-700);white-space:nowrap}
+.nav-links a.nav-auth:hover,.nav-links a.nav-auth:focus-visible{background:var(--blue-800);border-color:var(--blue-800);color:#fff;text-decoration:none}
 .app-main{max-width:1120px;padding-top:2.5rem;padding-bottom:3rem;min-height:calc(100vh - 160px)}
 .page-kicker{color:var(--blue-700);font-weight:800;letter-spacing:.13em;font-size:.73rem;margin-bottom:.5rem}
 h1,h2,h3{color:var(--blue-950);font-weight:750;letter-spacing:-.025em}
@@ -35,7 +38,7 @@ label input{font-weight:400}
 .text-muted{color:#5a748f!important}
 .app-footer{color:#607a93;font-size:.85rem;padding-top:1rem;padding-bottom:2rem;border-top:1px solid #cce1f2}
 table{background:#fff;border-color:var(--line)!important}
-@media(max-width:600px){.nav-inner{align-items:flex-start;flex-direction:column;gap:.45rem}.nav-links{justify-content:flex-start;gap:.35rem 1rem;font-size:.9rem}.app-main{padding-top:1.5rem;padding-bottom:2rem}.card-body{padding:1.1rem}h1{margin-bottom:1.2rem!important}.row>.col-12>.btn{width:100%}}
+@media(max-width:600px){.nav-inner{align-items:flex-start;flex-direction:column;gap:.45rem}.nav-links{width:100%;justify-content:flex-start;gap:.35rem 1rem;font-size:.9rem}.app-main{padding-top:1.5rem;padding-bottom:2rem}.card-body{padding:1.1rem}h1{margin-bottom:1.2rem!important}.row>.col-12>.btn{width:100%}}
 .card form.d-flex.justify-content-between{gap:.75rem;align-items:flex-start!important}
 .card form.d-flex.justify-content-between span{min-width:0;overflow-wrap:anywhere}
 .card form.d-flex.justify-content-between button{flex:none;white-space:nowrap}
