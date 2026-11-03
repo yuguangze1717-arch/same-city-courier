@@ -1,6 +1,6 @@
 # Same-City Courier System
 
-This is our group project for **HKMU COMP 3500SEF**. We built a small web app for sending parcels within Hong Kong. A sender creates and pays for an order, a dispatcher assigns a rider, and the rider takes the parcel to a storage point. The recipient can then check its status with the tracking number and the last four digits of their phone number.
+This is our group project for **COMP 3500SEF**. We built a small web app for sending parcels within Hong Kong. A sender creates and pays for an order, a dispatcher assigns a rider, and the rider takes the parcel to a storage point. The recipient can then check its status with the tracking number and the last four digits of their phone number.
 
 The payment is simulated. In this project, `DELIVERED` means the parcel has reached a storage point, not that the recipient has collected it.
 
@@ -9,8 +9,8 @@ The payment is simulated. In this project, `DELIVERED` means the parcel has reac
 You need Node.js 22 or newer and npm.
 
 ```bash
-git clone https://github.com/yuguangze1717-arch/hkmu-same-city-courier.git
-cd hkmu-same-city-courier
+git clone https://github.com/yuguangze1717-arch/same-city-courier.git
+cd same-city-courier
 npm ci
 cp .env.example .env
 npm run db:seed
